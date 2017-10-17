@@ -1,0 +1,113 @@
+	zw_k10极宽量化课件程序.使用说明
+	
+更多量化资料,请浏览网站：http://TopQuant.vip 或http://ziwang.com
+TopQuant 极宽量化社区（原zw量化），国内第一家Python量化社区!
+QQ群：124134140（zwPython大数据,量化交易,云字库，字王项目，唯一互动平台，千人大群）
+-----------------------
+	zw_k10极宽量化课件程序，是极宽Python量化三部曲第一部《零起点Python大数据与量化交易》的配套教学程序。
+	为方便大家学习，避免版本冲突，zw_k10课件源码目中，已内置了zwQuant量化程序和zw版talib金融函数库。
+	zw_k10教学课件看适用于zwPython、anacoda以及windows、linux、mac os等各种Python3平台，初学者建议使用zwPython教学版。
+	其他平台用户，请自行安装所需的模块库和zwDat金融数据包。
+	安装时请注意：
+	:: zw_k10可位于任意目录，默认是\zwpython\zw_k10\，尽量不要使用中文路径名。
+	:: zwDat金融数据包，必须与 zw_k10位于同一个目录，且作为根目录，\zwDat\。
+
+	-------------------
+	培训课件程序k10	v25版修订说明
+	
+	《zw量化·入门十讲》配套程序，第一版，是基于zwQuant测试版的。
+	随着zwQT的升级、相关函数接口api、参数的变化，部分代码运行时出现bug。
+	为此，特意根据zwQaunt对所有配套课件程序，进行了修改。
+	:: 为避免以后的版本冲突，此次课件代码，类似zw-down数据下载程序，配套集成了zwQuant25版本的程序。
+	:: 部分程序数据，和课件可能有所差异，属于正常调整，以实际代码为准。
+	:: 部分程序，需要py27运行环境，已经注明。
+	:: 
+	配套程序，默认是解压在zwPython\zw_k10\目录下
+	注意，只有一级\zw_k10\目录
+
+========================
+【附录】
+课件文件清单
+
+:: py35运行平台
+k101.py
+k101cmap.py
+k101cmap2.py
+k101dr.py
+k101sty.py
+k102m1cmap.py
+k102m1dr.py,
+k102m1ext3.py
+k102m1ext4.py
+k201_sta_anz.png
+k202_piplst.py
+k203ma_pdta.py
+k204ma_ta.py
+k301_down_us.py
+k302_down_cnBase.py
+k303_down_hist_data.py
+k303x_down_hist_data.py
+k304_down_h_data.py
+k305_pd_renam.py
+
+zq001.py
+zq501_stkLib.py
+zq502_qxLib.py
+zq601_k402inv.py
+zq602_mulTrade.py
+zq603_stkLib_ext.py
+zq701_k404sma.py
+zq702_sma_xt.py
+zq703_k406cma.py
+zq704_cma_xt.py
+zq705_k408vwap.py
+zq706_vwap_xt.py
+zq707_k410bbands.py
+zq708_bbands_xt.py
+zq801_tur_v1.py
+zq802_tur_v2.py
+zq803_tur_v3.py
+zq804_tur_v4.py
+zq805_tur_v5.py
+zq806_tur_v6.py
+zq809_tur_v9.py
+zq901_macd_v1.py
+zq902_macd_v2.py
+zq903_kdj01.py
+zq904_kdj02.py
+zq905_rsi01.py
+zqx01_sma.py
+zqx02_inxRd.py
+zqx03_inxCut.py
+zqx04_inxCut2.py 
+zqx05_inxNam.py
+zqx06_inxCut3.py
+zqx07_sma300.py
+zqx08_dvix.py
+zqx09_nil.py
+
+------------------------
+:: py27运行平台
+
+k201_sta_anz.py
+k306_sta_anz.py
+k309_zw_stk_xedit.py
+k401_down_mul_us.py
+k402_compinv01.py
+k402x_mycoo.py
+k403_tur04sr.py
+k404_tur04ed.py
+k405_tur04zw.py
+k406_sma_crossover_sample.py
+k406x_sma_crossover_sample.py
+k407_sma_crossover_zw.py
+k408_vwap_momentum.py
+k408x_vwap_momentum.py
+k409_vwap_momentum_zw.py
+k410_bbands.py
+k410x_bbands.py
+k411_bbands_zw.py
+k412_rsi2_sample.py
+k413_rsi2_zw.py
+
+其他的文件,是配套的模块和数据文件

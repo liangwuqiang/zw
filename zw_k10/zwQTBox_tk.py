@@ -34,202 +34,96 @@ import zwTools as zwt
 
 
 #-------------
+def xtick_down200(qx):
+    ''' 
+         根据股票代码，时间，下载tick分笔数据，并保存到tick目录下
+     中国A股,tick 历史或real实时 tick 分笔数据下载子程序
+        会自动将中文type，替换成 英文：中性盘：norm；买盘：buy; 卖盘：sell
+         
+     【输入】
+         xcod,股票代码
+         xtim，日期字符串，载的是当天 实时 tick数据
+     【输出】
+        df,股票 tick  数据
+            数据列格式：
+            time,price,change,volume,amount,type
+            输出目录:\zwdat\tick\code\xtim ，code，xtim根据各个股票不同而变化
+            '''
+    fss=qx.rdat+qx.code+'\\'+qx.xtim+'.csv'
+    xfg=os.path.exists(fss);
+    if not xfg:
+        df = ts.get_tick_data(qx.code,date=qx.xtim)
+        dn=len(xd);#  print('n',dn) # 跳过无数据 日期
+        if dn>10:  
+            df['type']=df['type'].str.replace(u'中性盘', 'norm');
+            df['type']=df['type'].str.replace(u'买盘', 'buy');
+            df['type']=df['type'].str.replace(u'卖盘', 'sell');
+            df.to_csv(fss,index=False,encoding='utf') 
 
 #-------------xtick tick分笔数据下载
   
-
+def xtick_setTimeDat(qx):
+    '''
+    设置分时数据下载和转换的初始参数
+    根据股票代码，对应的M05，5分钟分时数据。确定上一次下载的最后后期，进行追加
+    如果没有数据，默认初始日期是：qx.xday0k   2005-01-01    
+    输入：
+       qx.code，股票代码
+    输出： 
+        qx.xday0，起始下载日期
     
-def xtick_down_init(qx,finx):
     '''
-    根据finx股票代码文件名，读取数据到qx.stkCodeLib
-    并根据预设的日期，初始化相关的时间参数
-    [输入]
-        qx.xdayNum,下载时间周期为0，采用指定下载起始、结束日期模式
-            qx.xday0k，数据下载起始日期，为空使用默认起始日期：2005-01-01
-            qx.xday9k，数据下载结束日期，为空使用当前日期
-            日期为字符串格式，'yyyy-mm-dd'
-        qx.xdayNum,下载时间周期大于0时，采用指定时间周期模式，一般用于数据追加
-            #数据追加模式，无需设置起始、结束日期，
-            例如，qx.xdayNum=2  #下载今天以前2天的数据，注意这个是日历间隔，不是工作日间隔
-    '''
-    #---finx
-    qx.fn_stkCode=finx;print(finx)    
-    qx.stkCodeLib = pd.read_csv(finx,encoding='gbk');
-    qx.codeNum=len(qx.stkCodeLib['code']);
-    #---xtim0 qx.xday0k,qx.xday9k='2010-01-01','' qx.xday0k,qx.xday9k='',''
-    if qx.xdayNum>0:
-        qx.DTxtim9=dt.datetime.now()
-        qx.DTxtim0=qx.DTxtim9-dt.timedelta(days=qx.xdayNum) 
-    else:
-        if qx.xday9k=='':qx.DTxtim9=dt.datetime.now()
-        else:qx.DTxtim9=parse(qx.xday9k)
-        if qx.xday0k=='':qx.DTxtim0=dt.datetime.now()
-        else:qx.DTxtim0=parse(qx.xday0k)
-        #
-        #qx.DTxtim9=zwt.iff2(qx.xday9k=='',dt.datetime.now(),parse(qx.xday9k))
-        #qx.DTxtim0=zwt.iff2(qx.xday0k=='',qx.DTxtim9+dt.timedelta(days=-2) ,parse(qx.xday0k))
-        #
-        qx.xdayNum=rrule.rrule(rrule.DAILY,dtstart=qx.DTxtim0,until=qx.DTxtim9).count()
-    #    
-        
-    qx.xtim0Sgn,qx.xtim9Sgn=qx.DTxtim0.strftime('%Y-%m-%d'),qx.DTxtim9.strftime('%Y-%m-%d')
-    print('\n@nday',qx.xdayNum,qx.xtim0Sgn,'@',qx.xtim9Sgn);   #nday=13;
-    
-      
-            
-def xtick_down100(qx,ftg):
-    '''
-    根据指定的日期，股票代码，数据文件名：ftg
-    下载指定股票指定日期的ticks数据，并保存到ftg
-    [输入]
-        qx.code，股票代码
-        qx.xtimSgn，当前日期的字符串
-        ftg，保存tick数据的文件名
-    '''
-    df,dn=[],0
-    try:
-        df = ts.get_tick_data(qx.code,date=qx.xtimSgn)    #print(df.head())
-    except IOError: 
-        pass    #skip,error 
-    datFlag,dn=False,len(df);  print('     n',dn,ftg) # 跳过无数据 日期
-    #if zwt.xin(dn,0,9):print('n2',dn,ftg) 
-    if dn>10:  
-        df['type']=df['type'].str.replace(u'中性盘', 'norm');
-        df['type']=df['type'].str.replace(u'买盘', 'buy');
-        df['type']=df['type'].str.replace(u'卖盘', 'sell');
-        df.to_csv(ftg,index=False,encoding='utf') 
-        datFlag=True
-    #
-    return datFlag,dn
-            
-            
-def xtick_down8tim_codes(qx):
-    '''
-    下载指定日期，stkCodeLib包含的所有代码的tick历史分笔数据
-    并转换成对应的分时数据：5/15/30/60 分钟
-    数据文件保存在：对应的数据目录 \zwdat\tick\yyyy-mm\
-        目录下，yyyy，是年份；mm，是月份
-    运行时，会根据日期，股票代码，生成数据文件名：ftg
-    [输入]
-      qx.xtimSgn，当前日期的字符串
-      qx.stkCodeLib，包含所有股票代码的pd数据表格
-          '''
-    #qx.xday0ChkFlag=False self.codeInx0k=-1
-    #inx0,qx.codeNum=qx.codeInx,len(dinx['code']);
-    numNil=0;
-    for i,xc in enumerate(qx.stkCodeLib['code']):
-        code="%06d" %xc;#print("\n",i,"/",qx.codeNum,"code,",code)
-        qx.code,qx.codeCnt=code,i
-        #--- 
-        ftg='%s%s_%s.csv'%(qx.rtickTimMon,code,qx.xtimSgn);
-        xfg=os.path.exists(ftg);  
+    for ksgn0 in qx.min_ksgns: #qx.min_ksgns=['M05','M15','M30','M60']
+        ksgn='M'+ksgn0;
+        fss=zw._rdatMin+ksgn+'\\'+qx.code+'.csv'
+        xfg=os.path.exists(fss);    #print('@xf',xfg,xday,fss,xcod,xtim)
         if xfg:
-            numNil=0
+            df=pd.read_csv(fss,index_col=False,encoding='utf') 
+            df=df.sort_values(by=['time'],ascending=False)
+            qx.datMin[ksgn]=df
         else:
-            if numNil<90:
-                datFlag,dfNum=xtick_down100(qx,ftg)
-                numNil=zwt.iff2(datFlag,0,numNil+1)
-                if dfNum==3:numNil+=10;
-            #
-            print(xfg,datFlag,qx.codeCnt,"/",qx.codeNum,ftg,numNil)
-        #
-        if numNil>90:break
-        #if i>3:break
+            qx.datMin[ksgn]=pd.DataFrame(columns=zw.qxMinName);        
+    #    
+    if len(qx.datMin['M05'])>0:
+        df=qx.datMin['M05'];x0=df.iloc[0];
+        s2=x0['time'];xtim0=s2.split(' ')[0]
+    else:xtim0=qx.xday0k   #\2005-01-01    
+    #xday9,xday9k
+    qx.xday0=xtim0
+    #print('tim0',xtim0)
     
-def xtick_down8tim_all(qx,finx):
-    '''
-    下载所有股票代码的所有tick历史分笔数据，按时间日期循环下载
-    数据文件保存在：对应的数据目录 \zwdat\tick\yyyy-mm\
-        目录下，yyyy，是年份；mm，是月份
-    [输入]
-      finx，股票代码文件
-          '''
-    
-    xtick_down_init(qx,finx)
-    #qx.xday0ChkFlag=False
-    print('r',qx.rdat,qx.rtickTim);
-    #    self.rtickTimMon=self.rtickTim+'2010-01\\';  #   \zwDat\ticktim\  2012-01\
-    for tc in range(qx.xdayNum):
-        qx.DTxtim=qx.DTxtim0+dt.timedelta(days=tc) 
-        qx.xdayInx,qx.xtimSgn=tc,qx.DTxtim.strftime('%Y-%m-%d'); 
-        #
-        rmon0=qx.DTxtim.strftime('%Y-%m'); 
-        qx.rtickTimMon='%s%s\\' %(qx.rtickTim,rmon0)
-        xfg=os.path.exists(qx.rtickTimMon);
-        if not xfg:
-            os.mkdir(qx.rtickTimMon)
-        #
-        print('\n',xfg,qx.xdayInx,'/',qx.xdayNum,qx.xtimSgn)
-        #
-        xtick_down8tim_codes(qx)
-              
- 
-#----xtimck2tim.xxx 分笔tick数据，转换为分时数据
-
-    
-                 
-                    
-def xtick2tim_code010(qx):
-    '''
-    根据指定的股票代码，
-    把所有tick历史分笔数据
-    转换成对应的分时数据：5/15/30/60 分钟
-    数据文件保存在：对应的数据目录 \zwdat\min\
-    [输入]
-      qx.code，股票代码
-      qx.min_ksgns,分时数据时间模式列表，一般是[5，15，30，60]，也可以自行设置
-      self.xtickAppendFlag=False
-    '''
-    #xtick_setTimeDat(qx)
-    
-    for kss in qx.min_ksgns: 
-        rx.min_knum,rx.min_ksgnWrk=int(kss),'M'+kss
-        qx.datMin[kss]=pd.DataFrame(columns=zw.qxMinName);        
-        #默认=False，tick数据追加模式标志,如果=True,强行将所有tick文件转换为分时数据
-        if qx.xtickAppFlag:
-            
-            fss=zw._rdatTick+qx.code+'\\'+qx.xtim+'.csv'
-            xfg=os.path.exists(fss);
-            if xfg:qx.datMin[ksgn]=pd.read_csv(fss,index_col=False)
-    #
-    flst=os.listdir(zw._rdatTick+qx.code+'\\')
-    qx.codeCnt,qx.codeNum=0,len(flst)
-    for fs0 in flst:
-        qx.codeCnt+=1;nday=qx.codeNum-qx.codeCnt
-        if (not qx.xtickAppFlag)or (nday<qx.xtickAppNDay):
-            qx.xtim=fs0.split('.')[0]
-            xtick2tim100(qx)
-            print(qx.codeCnt,"/",qx.codeNum,qx.xtim,nday,qx.xtickAppNDay,qx.xtickAppFlag,'@',qx.code)
-        #
+def xtick_downsub(xcod,xtim):
+    ''' 中国A股,tick 历史或real实时 tick 分笔数据下载子程序
+        会自动将中文type，替换成 英文：中性盘：norm；买盘：buy; 卖盘：sell
         
-    #---------wr.code分时数据
-    xtick2minWr(qx,zw._rdatTick)
-    
-#---------
-
-def xtick2minWr(qx,rsk):
+    【输入】
+        xcod,股票代码
+        xtim，日期字符串，当xtim为空时，下载的是当天 实时 tick数据
+    【输出】
+        df,股票 tick  数据
+            数据列格式：
+            time,price,change,volume,amount,type
     '''
-    把所有分时数据，保存到文件
-    会自动去重
-    对应的数据目录 \zwdat\min\
-        输出数据在min目录对应的分时目录当中，已经自动转换为5,15,30,60分钟分时数据
     
-    '''
-    print(qx.min_ksgns)
-    for ksgn0 in qx.min_ksgns:
-        sgnMin='M'+ksgn0;
-        xdf=qx.datMin[sgnMin]    
-        xdf.drop_duplicates(subset='time', keep='last', inplace=True);
-        xdf=np.round(xdf,2)
-        xdf=xdf.sort_values(by=['time'],ascending=False)
-        #fss=zw._rdatMin+sgnMin+'\\'+qx.code+'.csv';print(fss)
-        fss=rsk+sgnMin+'\\'+qx.code+'.csv';print(fss)
-        if len(xdf)>3:
-            xdf.to_csv(fss,columns=zw.qxMinName,index=False,encoding='utf') 
-        qx.datMin[sgnMin]=xdf            
-
-            
-def xtick2minsub(df):
+    if xtim=='':
+        xd = ts.get_today_ticks(xcod)
+    else: 
+        xd = ts.get_tick_data(xcod,date=xtim)
+    
+    dn=len(xd);#  print('n',dn)
+    # 跳过无数据 日期
+    if dn>10:  
+        xd['type']=xd['type'].str.replace(u'中性盘', 'norm');
+        xd['type']=xd['type'].str.replace(u'买盘', 'buy');
+        xd['type']=xd['type'].str.replace(u'卖盘', 'sell');
+        #xd.to_csv('tmp\\'+xcod+'_'+xtim+'.csv',index=False,encoding='utf') 
+    else:
+        xd=[]
+    #
+    return xd
+  
+             
+def xtick_t2minsub(df):
     '''
     tick 数据 转换值程序，
     对根据qx.minType切割的数据，进行汇总，
@@ -249,29 +143,30 @@ def xtick2minsub(df):
     xlst=['norm','buy','sell']
     for xsgn in xlst:
         df2=df[df['type']==xsgn]
-        if len(df2)>0:
+        if len(df2>0):
             ds['vol_'+xsgn],ds['amo_'+xsgn]=np.sum(df2['volume']),np.sum(df2['amount'])    
         else:
             ds['vol_'+xsgn],ds['amo_'+xsgn]=0,0
     #
     return ds    
-       
-def xtick2min010(qx):
+  
+        
+def xtick_t2min(qx,sgnMin):
     '''
        将下载的tick分笔数据，转换为分时数据：5/15/30/60 分钟
        并且追加到对应的分时数据列表当中
        注意qx.xtimTick0,qx.xtimTick9是预设时间数据，在zwDatX类定义并初始化
        输入
-           qx.min_ksgnWrk
-           qx.min_knum
+           sgnMin，分时数据符号
+           qx.minTyp，分时数据间隔数据
            
     '''
     
     wrkDTim0,dt9=parse(qx.xtimTick0),parse(qx.xtimTick9)
     xt=dt9-wrkDTim0;numMin=xt.total_seconds()/60
-    xn9=int(numMin/qx.min_knum)+1;     #print(wrkDTim0,xn9); #xn9=7
+    xn9=int(numMin/qx.minType)+1;     #print(wrkDTim0,xn9); #xn9=7
     for tc in range(xn9):
-        wrkDTim9=wrkDTim0+dt.timedelta(minutes=qx.min_knum) 
+        wrkDTim9=wrkDTim0+dt.timedelta(minutes=qx.minType) 
         strTim0,strTim9=wrkDTim0.strftime('%H:%M:%S'),wrkDTim9.strftime('%H:%M:%S')
         #---cut tick.dat by tim
         df=qx.datTick;#print(df.head())
@@ -279,160 +174,174 @@ def xtick2min010(qx):
         df3=df2[df2['time']>=strTim0]
         if len(df3)>0:
             #-----tick 数据 转换为分时数据：5/15/30/60 分钟
-            ds=xtick2minsub(df3)
-            ds['time']=qx.xtimSgn+' '+strTim0
-            qx.datMin[qx.min_ksgnWrk]=qx.datMin[qx.min_ksgnWrk].append(ds.T,ignore_index=True)
+            ds=xtick_t2minsub(df3)
+            ds['time']=qx.xtim+' '+strTim0
+            qx.datMin[sgnMin]=qx.datMin[sgnMin].append(ds.T,ignore_index=True)
         #----ok,#tc
         wrkDTim0=wrkDTim9
-    
-def xtick2tim100(qx,fdat):
-    '''
-    根据输入的fdat文件名，读取tick分笔数据，并转换为对应的分时数据：5/15/30/60 分钟
-    【输入】
-    fdat，rick数据文件名
-    
-    '''
-    xfg=os.path.exists(fdat);#print('x100',xfg,fdat)
-    if xfg:
-        qx.datTick=pd.read_csv(fdat,index_col=False)
-        if len(qx.datTick)>10:
-            for kss in qx.min_ksgns: #qx.min_ksgns=['M05','M15','M30','M60']
-                qx.min_knum,qx.min_ksgnWrk,ksgn=int(kss),'M'+kss,'M'+kss
-                xtick2min010(qx)   
-                
-def xtick2tim_nday(qx):
-    '''
-    将指定时间周期的tick数据，转换为分时数据
-          '''
-    for tc in range(qx.xdayNum):
-        qx.DTxtim=qx.DTxtim0+dt.timedelta(days=tc) 
-        qx.xdayInx,qx.xtimSgn=tc,qx.DTxtim.strftime('%Y-%m-%d'); 
-        #
-        rmon0=qx.DTxtim.strftime('%Y-%m'); 
-        qx.rtickTimMon='%s%s\\' %(qx.rtickTim,rmon0)
-        fdat='%s%s_%s.csv'%(qx.rtickTimMon,qx.code,qx.xtimSgn);
-        #
-        print(qx.xdayInx,'/',qx.xdayNum,qx.xtimSgn,fdat)
-        xtick2tim100(qx,fdat)
-        
-        
-                 
-def xtick2tim_code100(qx):
-    '''
-    根据qx.min_ksgns预设的分时参数，
-    以及指定的股票代码、时间周期参数，
-    将对应的tick数据，转换为分时数据，并保存到文件
-    【输入】
-        qx.code，股票代码
-        qx.min_ksgns,分时数据时间模式列表，一般是[5，15，30，60]，也可以自行设置
-    【输出】
-       分时数据保存在目录：
-           \zwdat\min\Mxx\
-    '''
-    for kss in qx.min_ksgns: 
-        qx.min_knum,qx.min_ksgnWrk,ksgn=int(kss),'M'+kss,'M'+kss
-        qx.rminWrk='%s\\%s\\'%(qx.rmin0k,qx.min_ksgnWrk);
-        if not os.path.exists(qx.rminWrk):os.mkdir(qx.rminWrk)
-        #
-        qx.datMin[ksgn]=pd.DataFrame(columns=zw.qxMinName);        
-        fss='%s%s.csv'%(qx.rminWrk,qx.code);    #print('@fss',fss,len(qx.datMin[ksgn]))
-        xfg=os.path.exists(fss); #print(xfg,'@f100',fss,len(qx.datMin[ksgn]))
-        if xfg:
-            qx.datMin[ksgn]=pd.read_csv(fss,index_col=False)
-            print('\n@fss',fss,len(qx.datMin[ksgn]))
     #
-    xtick2tim_nday(qx)   
-    xtick2minWr(qx,qx.rmin0k)
-    
+    #
+    #
+    #print('\n x2min ok')
 
-def xtick2tim_allcode(qx):
+def xtick_xminWr(qx):
     '''
-    将所有股票代码的tick数据转换为分时数据
+    把所有分时数据，保存到文件
+    会自动去重
+    对应的数据目录 \zwdat\min\
+        输出数据在min目录对应的分时目录当中，已经自动转换为5,15,30,60分钟分时数据
+    
+    '''
+    print(qx.min_ksgns)
+    for ksgn0 in qx.min_ksgns:
+        sgnMin='M'+ksgn0;
+        xdf=qx.datMin[sgnMin]    
+        xdf.drop_duplicates(subset='time', keep='last', inplace=True);
+        xdf=np.round(xdf,2)
+        xdf=xdf.sort_values(by=['time'],ascending=False)
+        fss=qx.rdat+sgnMin+'\\'+qx.code+'.csv';print(fss)
+        xdf.to_csv(fss,columns=zw.qxMinName,index=False,encoding='utf') 
+        qx.datMin[sgnMin]=xdf
+    
+def xtick_down100(qx):
+    '''
+    根据股票代码，时间，下载tick分笔数据，并转换为对应的分时数据：5/15/30/60 分钟
+    
+    '''
+    df=xtick_downsub(qx.code,qx.xtim)
+    if len(df)>10:
+        #print(len(df),qx.fn_tick,'\n',df.head())
+        qx.datTick=df
+        for ksgn0 in qx.min_ksgns: #qx.min_ksgns=['M05','M15','M30','M60']
+            sgnMin='M'+ksgn0;qx.minType=int(ksgn0);       # print('@mt',qx.minType)
+            xtick_t2min(qx,sgnMin)    
+#----    
+        
+def xtick_down_all_time(qx):
+    '''
+    下载制定股票代码的所有tick历史分笔数据
+    并转换成对应的分时数据：5/15/30/60 分钟
+    数据文件保存在：对应的数据目录 \zwdat\min\
+    [输入]
+      qx.code，股票代码
+    '''
+    xtick_setTimeDat(qx)
+    # xday9k#
+    qx.DTxtim0,qx.DTxtim9=parse(qx.xday0),dt.datetime.now();
+    nday=rrule.rrule(rrule.DAILY,dtstart=qx.DTxtim0,until=qx.DTxtim9).count()
+    #print('@t',nday,qx.DTxtim0,'@',qx.DTxtim9);   #nday=13;
+    kc=0
+    for tc in range(nday):
+        qx.DTxtim=qx.DTxtim0+dt.timedelta(days=tc) 
+        qx.xtim=qx.DTxtim.strftime('%Y-%m-%d'); print(tc,'tc',kc,qx.xtim,qx.code)
+        #
+        xtick_down100(qx)
+        kc+=1;
+        if kc>100:
+            kc=0
+            xtick_xminWr(qx)
+            
+        #qx.datLib.to_csv(qx.fn_dat,index=False,encoding='utf') #
+    #----#tc,cod#1
+    if kc>0:
+        xtick_xminWr(qx)
+    #if kc>0:qx.datLib.to_csv(qx.fn_dat,index=False,encoding='utf') #
+
+        
+def xtick_down_all(qx,finx):
+    '''
+       下载finx股票列表，所有股票的历史tick分笔数据
+       并转换成对应的分时数据：5/15/30/60 分钟
+       数据文件保存在：对应的数据目录 \zwdat\min\
     输入：
-        qx.stkCodeLib:，股票代码列表文件，
-        qx.min_ksgns,分时数据时间模式列表，一般是[5，15，30，60]，也可以自行设置
+        finx，股票目录索引文件，一般每个股票，下载需要2-3分钟，
+            单机股票代码不要太多，可以分组在多台电脑运行
     输出
         \zwdat\min\
+        输出数据在min目录对应的分时目录当中，已经自动转换为5,15,30,60分钟分时数据
+        为当天最新实时分笔数据，会自动覆盖以前的就数据
+    '''
+    #fss=qx.rdatInx+'stk_code.csv';print(fss);
+    qx.rdat=zw._rdatMin;print('finx',finx);
+    dinx = pd.read_csv(finx,encoding='gbk') 
+    i,xn9=0,len(dinx['code']);
+    for xc in dinx['code']:
+        code="%06d" %xc
+        #code=zwTools.v2sk(xc,6);
+        print("\n",i,"/",xn9,"code,",code)
+        #---
+        qx.code=code;
+        xtick_down_all_time(qx)
+        i+=1;qx.codeCnt=i
+#----------------------
+def xtick2_down_all(qx,finx):
+    '''
+       下载finx股票列表，所有股票的历史tick分笔数据
+       并转换成对应的分时数据：5/15/30/60 分钟
+       数据文件保存在：对应的数据目录 \zwdat\min\
+    输入：
+        finx，股票目录索引文件，一般每个股票，下载需要2-3分钟，
+            单机股票代码不要太多，可以分组在多台电脑运行
+    输出
+        \zwdat\min\
+        输出数据在min目录对应的分时目录当中，已经自动转换为5,15,30,60分钟分时数据
+        为当天最新实时分笔数据，会自动覆盖以前的就数据
+        ---
+        fss=zwProject._rdatMin+ksgn+'\\'+qx.code+'.csv'
+        xfg=os.path.exists(fss);  
+    '''
+    #fss=qx.rdatInx+'stk_code.csv';print(fss);
+    qx.rdat=zw._rdatTick;print('finx',finx);
+    dinx = pd.read_csv(finx,encoding='gbk') 
+    i,xn9=0,len(dinx['code']);
+    for xc in dinx['code']:
+        code="%06d" %xc
+        #code=zwTools.v2sk(xc,6);
+        print("\n",i,"/",xn9,"code,",code)
+        rss,qx.code=qx.rdat+code+'\\',code
+        xfg=os.path.exists(rss);  
+        print(xfg,rss)
+        #---
+        if not xfg:
+            os.mkdir(rss)
+        #xtick2_down_all_time(qx)
+        #i+=1;qx.codeCnt=i       
+#---------------------
+    
+def xtick_down_all_real(qx,finx):
+    '''
+    下载当天的实时tick分笔数据
+    输入：
+        finx，股票目录索引文件，一般每个股票，下载需要2-3分钟，
+            单机股票代码不要太多，可以分组在多台电脑运行
+    输出
+        \zwdat\tick\
         输出数据在tick目录对应的分时目录当中，已经自动转换为5,15,30,60分钟分时数据
         为当天最新实时分笔数据，会自动覆盖以前的就数据
     '''
-    for i,xc in enumerate(qx.stkCodeLib['code']):
-        code="%06d" %xc;#print("\n",i,"/",qx.codeNum,"code,",code)
-        qx.code,qx.codeCnt=code,i
-        print(qx.codeCnt,"/",qx.codeNum,qx.rtickTimMon,code,qx.xtimSgn)
-        #
-        xtick2tim_code100(qx)
-                
-
-        
-#---------------xtick.real.xxx
-
-def xtick_real_downsub(xcod):
-    ''' 中国A股,tick 历史或real实时 tick 分笔数据下载子程序
-        会自动将中文type，替换成 英文：中性盘：norm；买盘：buy; 卖盘：sell
-        
-    【输入】
-        xcod,股票代码
-        xtim，日期字符串，当xtim为空时，下载的是当天 实时 tick数据
-    【输出】
-        df,股票 tick  数据
-            数据列格式：
-            time,price,change,volume,amount,type
-    '''
-    xd = ts.get_today_ticks(xcod);
-    dn=len(xd);#  print('n',dn) # 跳过无数据 日期
-    if dn>10:  
-        xd['type']=xd['type'].str.replace(u'中性盘', 'norm');
-        xd['type']=xd['type'].str.replace(u'买盘', 'buy');
-        xd['type']=xd['type'].str.replace(u'卖盘', 'sell');
-        #xd.to_csv('tmp\\'+xcod+'_'+xtim+'.csv',index=False,encoding='utf') 
-    else:
-        xd=[]
-    #
-    return xd
-    
-def xtick_real_down_all(qx,finx):
-    '''
-    下载当天的实时tick分笔数据，并自动转换为分时数据
-    输入：
-        finx，股票目录索引文件，一般每个股票，下载需要2-3分钟，
-            如果做高频。单机股票代码不要太多，可以分组在多台电脑运行
-        qx.min_ksgns，股票分时参数，例如：['20','60']
-    输出
-        \zwdat\tickreal\ 输出目录
-        \zwdat\tickreal\tick\ 分笔tick数据
-        \zwdat\tickreal\Mxx\ 分笔tick数据，转换后的分时数据
-        
-        输出数据在对应的tick目录当中，已经自动转换为分时数据
-        当天最新实时tikc、分笔数据，会自动覆盖以前的旧数据
-        
-        
-    '''
-    #qx.min_ksgns=['05','15','30','60']
-    rdat=zw._rdatTickReal;
-    dinx = pd.read_csv(finx,encoding='gbk');print('finx',finx);
+    #fss=qx.rdatInx+'stk_code.csv';
+    qx.rdat=zw._rdatTick;print('finx',finx);
+    dinx = pd.read_csv(finx,encoding='gbk');
     i,xn9=0,len(dinx['code']);
     for xc in dinx['code']:
-        i+=1;code="%06d" %xc;
-        qx.codeCnt,qx.code=i,code
+        i+=1;qx.codeCnt=i
+        code="%06d" %xc
+        #code=zwTools.v2sk(xc,6);
         print("\n",i,"/",xn9,"code,",code)
         #---
-        df=xtick_real_downsub(code)
+        qx.code=code;
+        #xtick_down_all_time(qx)
+        df=xtick_downsub(code,'')
         if len(df)>10:
-            fss=rdat+'tick\\'+qx.code+'.csv';print('\n',fss)
+            #print(len(df),qx.fn_tick,'\n',df.head())
+            fss=qx.rdat+'tick\\'+qx.code+'.csv';print('\n',fss)
             df.to_csv(fss,index=False,encoding='utf') 
             qx.datTick=df
             #---------- tick 分笔数据，转换为分时数据：05,15,30,60
-            for kss in qx.min_ksgns: #qx.min_ksgns=['M05','M15','M30','M60']
-                qx.min_knum,qx.min_ksgnWrk,ksgn=int(kss),'M'+kss,'M'+kss
-                qx.rminWrk='%s\\%s\\'%(qx.rmin0k,qx.min_ksgnWrk);
-                if not os.path.exists(qx.rminWrk):os.mkdir(qx.rminWrk)
-                #
-                #sgnMin='M'+ksgn0;qx.minType=int(ksgn0);       # print('@mt',qx.minType)
-                qx.datMin[ksgn]=pd.DataFrame(columns=zw.qxMinName);        
-                xtick2min010(qx)   
-            #
-            xtick2minWr(qx,rdat)
+            for ksgn0 in qx.min_ksgns: #qx.min_ksgns=['M05','M15','M30','M60']
+                sgnMin='M'+ksgn0;qx.minType=int(ksgn0);       # print('@mt',qx.minType)
+                qx.datMin[sgnMin]=pd.DataFrame(columns=zw.qxMinName);        
+                xtick_t2min(qx,sgnMin)   
 
 #----------------down.stk
 
@@ -481,22 +390,39 @@ def down_stk_cn020inx(qx,xtim0):
            
     return xd      
     
-def down_stk_cn010(qx):
+def down_stk_cn010(qx,xtyp="D"):
     ''' 中国A股数据下载子程序
     【输入】
         qx (zwDatX): 
         xtyp (str)：数据类型，9,Day9,简版股票数据，可下载到2001年，其他的全部是扩充版数据，只可下载近3年数据
-            D=日k线 W=周 M=月 默认为D
+            D=日k线 W=周 M=月 5=5分钟 15=15分钟 30=30分钟 60=60分钟，默认为D
     :ivar xcod (int): 股票代码
     :ivar fss (str): 保存数据文件名
     '''
     
-    xcod,rss,=qx.code,qx.rDay;
-    tim0='1994-01-01';#tim0='2012-01-01';
-    #
+    xcod=qx.code;xd=[];tim0='2012-01-01';
+    if (xtyp=='0'):    
+        rss=qx.rDay
+        tim0='1994-01-01'  #2000-01-01
+    elif (xtyp=='D'):    
+        rss=qx.rDay9            
+    elif (xtyp=='T'):    
+        rss=qx.rTmp;
+    
+    elif (xtyp=='5'):  
+        rss=qx.rM05
+    elif (xtyp=='15'):        
+        rss=qx.rM15
+    elif (xtyp=='30'):        
+        rss=qx.rM30
+    elif (xtyp=='60'):        
+        rss=qx.rM60;
+    
     fss=rss+xcod+'.csv'
+    #if ((xtyp!='D')and(xtyp!='9') ):    tim0=tim0+" 00:00:00";
+        
     #-------------------
-    xfg=os.path.exists(fss);xd0=[];xd=[];
+    xfg=os.path.exists(fss);xd0=[];
     if xfg:
         xd0= pd.read_csv(fss,index_col=0,parse_dates=[0],encoding='gbk') 
         #print(xd0.head())
@@ -508,8 +434,10 @@ def down_stk_cn010(qx):
     print('\n',xfg,fss,",",tim0);   
     #-----------    
     try:
-        xd=ts.get_h_data(xcod,start=tim0,end=None,retry_count=5,pause=1)     #Day9
-        #xd=ts.get_hist_data(xcod,start=tim0,end=None,retry_count=5,pause=1,ktype=xtyp);
+        if ((xtyp=="0")or(xtyp=="T")):
+            xd=ts.get_h_data(xcod,start=tim0,end=None,retry_count=5,pause=1)     #Day9
+        else: #ktype：数据类型，D=日k线 W=周 M=月 5=5分钟 15=15分钟 30=30分钟 60=60分钟，默认为D
+            xd=ts.get_hist_data(xcod,start=tim0,end=None,retry_count=5,pause=1,ktype=xtyp);
         #-------------
         if xd is not None:
             if (len(xd0)>0):         
@@ -530,36 +458,6 @@ def down_stk_cn010(qx):
            
     return xd  
     
-def down_stk_all(qx,finx):
-    '''
-    根据finx股票列表文件，下载所有，或追加日线数据
-    自动去重，排序
-    
-    '''
-    dinx = pd.read_csv(finx,encoding='gbk') ;print(finx);
-    xn9=len(dinx['code']);
-    for i,xc in enumerate(dinx['code']):
-        code="%06d" %xc
-        print("\n",i,"/",xn9,"code,",code)
-        #---
-        qx.code=code;
-        down_stk_cn010(qx);
-            
-def down_stk_inx(qx,finx):
-    dinx = pd.read_csv(finx,encoding='gbk');print(finx); 
-    
-    xn9=len(dinx['code']);
-    for i in range(xn9):
-    #for xc,xtim0 in dinx['code'],dinx['tim0']:
-        d5=dinx.iloc[i]
-        xc=d5['code'];xtim0=d5['tim0']
-        i+=1;code="%06d" %xc
-        print("\n",i,"/",xn9,"code,",code,xtim0)
-        #---
-        qx.code=code;
-        down_stk_cn020inx(qx,xtim0)
-        
-   
     
 def down_stk_yahoo010(qx,ftg):
     '''
@@ -594,7 +492,7 @@ def stkInxLibRd(qx):
     qx.stkInxName='sz001'    #大盘指数名称，拼音
     qx.stkInxCName='上证指数'    #大盘指数中文名称，拼音
     #
-    zw.stkInxLib=None  #全局变量，大盘指数，内存股票数据库
+    zwProject.stkInxLib=None  #全局变量，大盘指数，内存股票数据库
     
     '''
     if qx.stkInxCode!='':
@@ -606,17 +504,16 @@ def stkInxLibRd(qx):
             zw.stkInxLib=df10.sort_index();
 
 def stkInxLibSet8XTim(qx,dtim0,dtim9):
-    ''' 根据时间段，切割大盘指数数据 zw.stkInxLib
+    ''' 根据时间段，切割大盘指数数据 zwProject.stkInxLib
     
     Args:
         dtim0（str）：起始时间
         dtim9（str）:结束时间
             
     :ivar
-    zw.stkInxLib，大盘指数数据
+    zwProject.stkInxLib，大盘指数数据
     '''
-    df10=zw.stkInxLib;
-    #print(df10.head())
+    df10=zw.stkInxLib
     if dtim0=='':
         df20=df10;
     else:
@@ -692,9 +589,9 @@ def stkLibSet8XTim(dtim0,dtim9):
         else:
             df20=df10[(df10.index>=dtim0)&(df10.index<=dtim9)]
         #
-        #zw.stkLibCode.append(xcod);
+        #zwProject.stkLibCode.append(xcod);
         zw.stkLib[xcod]=df20.sort_index();
-        #print(zw.stkLib[xcod])
+        #print(zwProject.stkLib[xcod])
         #print(df20)
 
 def stkLibSetDVix():
@@ -1049,7 +946,7 @@ def xusr4xtrd(qx,b2):
     xcod=b2['code'];
     if xcod!='':
         xfg=xcod in qx.qxUsrStk;
-        #s2=zwBox.xobj2str(b2,zw.xbarName);print(xfg,'::b2,',s2)
+        #s2=zwBox.xobj2str(b2,zwProject.xbarName);print(xfg,'::b2,',s2)
     
         if xfg:
             xnum=qx.qxUsrStk[xcod];
@@ -1086,7 +983,7 @@ def xtrdLibNilAdd(qx):
     qx.xtrdChk['ID']='nil';
     qx.xtrdNilLib=qx.xtrdNilLib.append(qx.xtrdChk.T,ignore_index=True)  
     
-#--zw.ret.xxx
+#--zwProject.ret.xxx
   
 def zwRetTradeCalc(qx):
     ''' 输出、计算交易数据
@@ -1314,7 +1211,7 @@ def df2cnstk(df0):
     
 
 def df2zw(df0):
-    ''' 股票数据格式转换，转换为 zw 格式
+    ''' 股票数据格式转换，转换为 zwProject 格式
     
     Args:
         df0 (pd.DataFrame): 股票数据
@@ -1336,7 +1233,7 @@ def df2zw(df0):
     return df2
 
 def df2zwAdj(df0):
-    ''' 股票数据格式转换，转换为 zw 增强版格式，带 adj close
+    ''' 股票数据格式转换，转换为 zwProject 增强版格式，带 adj close
     
     Args:
         df0 (pd.DataFrame): 股票数据
@@ -1475,10 +1372,9 @@ def sta_dataPre0xtim(qx,xnam0):
         if xt9k!='':                
             if qx.xtim9>xt9k:qx.xtim9=xt9k;
         qx.qxTimSet(qx.xtim0,qx.xtim9)
-        stkLibSet8XTim(qx.xtim0,qx.xtim9);#    print('zw.stkLibCode',zw.stkLibCode)
+        stkLibSet8XTim(qx.xtim0,qx.xtim9);#    print('zwProject.stkLibCode',zwProject.stkLibCode)
     
     #---stkInx 读取大盘指数数据，并裁剪数据源
-    #print('finx',qx.stkInxCode)
     if qx.stkInxCode!='':    
         stkInxLibRd(qx)
         stkInxLibSet8XTim(qx,qx.xtim0,qx.xtim9)
@@ -1507,11 +1403,11 @@ def cross_Mod(qx):
     kmod=-9;
     if  (dp>dma)and(dp2n<ma2n)and(dp>dp2n):
         kmod=1;
-        #print('   crs',kmod,'xbar\n',xbar)
+        #print(kmod,'xbar',xbar)
     elif (dp<dma)and(dp2n>ma2n)and(dp<dp2n):
         kmod=-1;
-        #print('   crs',kmod,'xbar\n',xbar)
-        
+        #print(kmod,'xbar',xbar)
+
     return kmod    
 
 

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- 
+#  -*- coding: utf-8 -*- 
 """
     模块名：zwTools.py
     默认缩写：zwt, 示例：zwTools.py as zwt
@@ -12,40 +12,39 @@
     开发：zw量化开源团队 2016.04.01 首发
   
 """
-#
-# zwTools.py as zwt.
+# 
+#  zwTools.py as zwt.
 
-import sys, os
+# import sys
+import os
 import time
 
-import numpy as np
-import pandas as pd
-import tushare as ts
-#import talib as ta
+# import numpy as np
+# import pandas as pd
+# import tushare as ts
+# import talib as ta
 
-import matplotlib as mpl
-from matplotlib import pyplot as plt
+# import matplotlib as mpl
+# from matplotlib import pyplot as plt
 
 import datetime as dt
 from dateutil.rrule import *
-from dateutil.parser import *
+# from dateutil.parser import *
 
-import csv
+# import csv
 import pickle
 import numexpr as ne  
 
-import zw.zwSys as zw  #zwQuant
-import zw.zwQTBox as zwx
+# import zwProject.zwSys as zwProject   # zwQuant
+# import zwProject.zwQTBox as zwx
 
 
-
-    
-#----hot.funs
+# ----hot.funs
 def xinEQ(d, k0, k9):
     """ 如果d位于(k0,  k9)间，包含等于，返回True
  		    d可以是数值，字符串
        """
-    #return (d>=k0)&(d<=k9)
+    # return (d>=k0)&(d<=k9)
     return ne.evaluate('(d>=k0)&(d<=k9)')
 
 def xin(xk, k0sgn, k9sgn):
@@ -53,7 +52,7 @@ def xin(xk, k0sgn, k9sgn):
        xk可以是数值，字符串
        """
 
-    #return (xk>k0sgn)&(xk<k9sgn)    
+    # return (xk>k0sgn)&(xk<k9sgn)    
     return ne.evaluate('(xk>k0sgn)&(xk<k9sgn)')
 
 
@@ -67,6 +66,8 @@ def iff2(kflag, x1, x0):
         return x1
     else:
         return x0 
+
+
 def iff3(v, k, xn1, x0, x1):
     """ 三选一函数，如果v<k，返回值是xn1；v=k，返回值是x0；v>k，返回值是x1；
     """
@@ -87,18 +88,21 @@ def wait(n, mstr=''):
         print(mstr) 
         
     time.sleep(n)
-    
+
+
 def lastDay(y, m):
     return rrule(MONTHLY,  count=1,  bymonthday=(-1), dtstart=dt.datetime(y, m, 1))[0].day
     
-#----cov.x2str
+# ----cov.x2str
+
+
 def xobj2str(xobj, xnamLst):
     """ 对象属性字符串，根据属性列表，生成字符串
         
-        #qxLibName=['time', 'ID', 'stkVal', 'cash', 'dret', 'val'] 
+        # qxLibName=['time', 'ID', 'stkVal', 'cash', 'dret', 'val'] 
         """
 
-    #print('\n::QxUsr') 
+    # print('\n::QxUsr') 
     dss='' 
     for cnam in xnamLst:
         ess=str(xobj[cnam]) 
@@ -106,12 +110,13 @@ def xobj2str(xobj, xnamLst):
 
     return dss
 
-#----debug
+
+# ----debug
 def xdebug(xmod, mnam, fnam):
     """ 输出调试信息
     
     Args:
-        xmod (int): #调试Mod，0：不调试；1：主模块，', __name__=__main__；2：子模块
+        xmod (int): # 调试Mod，0：不调试；1：主模块，', __name__=__main__；2：子模块
         mnam (str): __name__
         fnam (str): sys._getframe().f_code.co_name
             
@@ -126,7 +131,7 @@ def xdebug(xmod, mnam, fnam):
         print('\n@mod:', mnam, ', @fun:', fnam) 
 
     
-#----lst.xxx
+# ----lst.xxx
 def lst4dir(rss):
     """ 目录文件生成列表数据
     """
@@ -134,7 +139,7 @@ def lst4dir(rss):
     flst=[] 
     for root, dirs, files in os.walk(rss):
         for fss in files:
-            #print(fss)
+            # print(fss)
             flst.append(fss)
     return flst   
     
@@ -154,8 +159,8 @@ def listWr(fnam, lst):
     """
 
     fhnd=open(fnam, 'wb') 
-    #testList = [ 123,  { 'Calories' : 190 },  'Mr. Anderson',  [ 1,  2,  7 ] ] 
-    pickle.dump (lst, fhnd) #, True
+    # testList = [ 123,  { 'Calories' : 190 },  'Mr. Anderson',  [ 1,  2,  7 ] ] 
+    pickle.dump (lst, fhnd)  # , True
     fhnd.close() 
 
 

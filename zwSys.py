@@ -5,30 +5,30 @@
 #   http://www.ziwang.com, Python量化第一品牌 
 #   
 #   文件名:zwSys.py
-#   说明：import zwSys as zw
+#   说明：import zwSys as zwProject
 #        设置常用变量, 类定义、初始化函数
 #   
-#   =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =   
+#  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =
 
-import sys, os
-import numpy as np
+# import sys, os
+# import numpy as np
 import pandas as pd
-import tushare as ts
+# import tushare as ts
 # import talib as ta
 
-import datetime as dt
+# import datetime as dt
 from dateutil.parser import parse
 from dateutil import rrule
 
 
-import matplotlib as mpl
-from matplotlib import pyplot as plt
+# import matplotlib as mpl
+# from matplotlib import pyplot as plt
 
-import zw.zwTools as zwt
-import zw.zwQTBox as zwx
+import zwProject.zwTools as zwt
+import zwProject.zwQTBox as zwx
 
 
-# ----zw.var...
+# ----zwProject.var...
 __version__ = '2016.M5'
 
 # 颜色变量
@@ -55,7 +55,7 @@ _rdatMin = _rdat0+"min\\"
 _rdatTick = _rdat0+"tick\\"
 _rdatTickReal = _rdat0+"tickreal\\"
 
-_rdatZW = _rdat0+"zw\\"
+_rdatZW = _rdat0+"zwProject\\"
 
 _rTmp = "\\zwPython\\zwQuant\\demo\\tmp\\"
 
@@ -295,7 +295,7 @@ class zwQuantX(object):
         nss = '{:06d}'.format(self.trdCnt)
         # tim = parse(self.xtim)
         # timStr = tim.strftime('%Y%m%d')
-        self.qxID = self.prjName + '_' +nss
+        self.qxID = self.prjName + '_' + nss
         # print(s2, ', ', qx.trdCnt)
         # print('trdID', qx.trdID)
     
