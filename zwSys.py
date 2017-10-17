@@ -24,8 +24,8 @@ from dateutil import rrule
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 
-import zwTools as zwt
-import zwQTBox as zwx
+import zw.zwTools as zwt
+import zw.zwQTBox as zwx
 
 
 # ----zw.var...
@@ -77,7 +77,8 @@ ohlcLst = ['open', 'high', 'low', 'close']
 ohlcExtLst = ['date', 'open', 'high', 'low', 'close', 'volume', 'adj close']
 xtrdName = ['date', 'ID', 'mode', 'code', 'dprice', 'num', 'kprice', 'sum', 'cash']
 xtrdNil = ['', '', '', '', 0, 0, 0, 0, 0]
-qxLibName = ['date', 'stkVal', 'cash', 'dret', 'val', 'downLow', 'downHigh', 'downDay', 'downKMax']
+qxLibName = ['date', 'stkVal', 'cash', 'dret', 'val', 'downLow',
+             'downHigh', 'downDay', 'downKMax']
 qxLibNil = ['', 0, 0, 0, 0, 0, 0, 0, 0]  # xBars:DF
 
 stkInxLib = None  # 全局变量，大盘指数，内存股票数据库
@@ -138,20 +139,23 @@ class zwQuantX(object):
 
         # taxi, 佣金，扣税
         self.prjName = prjNam
-        self.fn_qxLib = 'tmp\\'+prjNam+'_qxLib.csv'
-        self.fn_xtrdLib = 'tmp\\'+prjNam+'_xtrdLib.csv'
+        self.fn_qxLib = 'tmp/' + prjNam + '_qxLib.csv'
+        self.fn_xtrdLib = 'tmp/' + prjNam + '_xtrdLib.csv'
         # ---
         self.mbase = dbase0
         self.money = dbase0
         # 
-        xtim0 = '';  xtim9 = ''
+        xtim0 = ''
+        xtim9 = ''
         self.xtim0 = xtim0
         self.xtim9 = xtim9
         self.xtim = xtim0     
         self.DTxtim0 = None
         self.DTxtim9 = None
-        if self.xtim0 != '':self.DTxtim0 = parse(self.xtim0)
-        if self.xtim9 != '':self.DTxtim9 = parse(self.xtim9)
+        if self.xtim0 != '':
+            self.DTxtim0 = parse(self.xtim0)
+        if self.xtim9 != '':
+            self.DTxtim9 = parse(self.xtim9)
         
         # 
         self.stkKCash = 0.9     # 默认，每次买入90%的资金  
@@ -206,7 +210,6 @@ class zwQuantX(object):
         self.staVars = [0, '', '']  # 策略变量输入数据列表
         self.staName = ''
 
-        
         # ---drawdown.var
         self.downHigh = 0
         self.downLow = 0
@@ -228,8 +231,7 @@ class zwQuantX(object):
         self.xbarWrk = None
         self.xdatWrk = None
         self.xtrdChk = None
-        
-         
+
         # ----misc
         # debug
         # ', __name__, ', @fun:', sys._getframe().f_code.co_name)
@@ -246,8 +248,6 @@ class zwQuantX(object):
         self.priceCalc = 'adj close'
         # 
         # -----init.set
-
-
 
     def qxTimSet(self, xtim0, xtim9):
         """ 设置时间参数
@@ -274,7 +274,6 @@ class zwQuantX(object):
         # self.trdCnt = 0
         self.qxID = 0
         
-       
     def qxTim9SetVar(self, xtim):
         """ 回溯测试时间点结束，整理相关数据
           
@@ -286,7 +285,6 @@ class zwQuantX(object):
         # self.qxLib.append(self.qxUsr.T, ignore_index = True)
         self.qxLib = self.qxLib.append(self.qxUsr.T, ignore_index = True)
         # self.qxLib.dropna(inplace = True)
-        
 
     def qxIDSet(self):
         """ 生成订单流水号编码ID
@@ -297,13 +295,12 @@ class zwQuantX(object):
         nss = '{:06d}'.format(self.trdCnt)
         # tim = parse(self.xtim)
         # timStr = tim.strftime('%Y%m%d')
-        self.qxID = self.prjName+'_'+nss
+        self.qxID = self.prjName + '_' +nss
         # print(s2, ', ', qx.trdCnt)
         # print('trdID', qx.trdID)
     
         return self.qxID    
         
-            
     # def xobj2str(xobj, xnamLst):
     def prQxUsr(self):
         """ 输出用户变量保存的数据
@@ -313,7 +310,6 @@ class zwQuantX(object):
         print('\n::qxUsr')
         dss = zwt.xobj2str(self.qxUsr, qxLibName)
         print(dss, '\n')
-        
         
     def prQLib(self):
         """ 输出各种回溯交易测试数据，一般用于结束时
@@ -397,16 +393,11 @@ class zwDatX(object):
         self.datTick = []
         self.datMin = {} # pd.DataFrame(columns = qxMinName)
 
-        
-        
-        
         # self.xday0 = ''
         # self.xtickAppNDay = 3      # tick装换时，追加模式下，默认追加的日期文件数
         # self.xtickAppFlag = False  # 默认 = False，tick数据追加模式标志, 如果 = True, 强行将所有tick文件转换为分时数据
         # self.xday0ChkFlag = True   #   默认 = True，如果qx.xday0ChkFlag = Flase，强制从xday0k日开始抓取数据，主要用于用于补漏
-        
-        
-        
+
         # ---------
         self.rTmp = _rTmp        
         self.rdat = rs0       
@@ -414,7 +405,6 @@ class zwDatX(object):
         self.rdatCN = _rdatCN
         self.rdatUS = _rdatUS
         self.rdatInx = _rdatInx
-        
         
         self.rdatZW = _rdatZW
         self.rZWcnXDay = _rdatZW+"cnXDay\\"
