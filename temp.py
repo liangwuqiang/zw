@@ -1,20 +1,12 @@
-# -*- coding: utf-8 -*-
-#   zw量化开源团队 
-#   中文注释 我怎能不戏猫 （QQ： 316894075）
-#   这个版本原名k102m1_note，感谢猫猫同学的逐行中文注解，
-#   非常详细，是难点的入门案例
+
 #   v25版优化是，用zwTools模块库的函数lastDay(ynum,kmon)，每月最后一天日期
 #   改写了zw_anz_m1sub函数，简化了步骤
-# 
-# 
-# 
 
-# import sys
 import pandas as pd
 import numpy as np
 
-import zwProject.zwSys as zw  #::zwQT
-import zwProject.zwTools as zwt
+import zwPython.zwSys as zw  #::zwQT
+import zwPython.zwTools as zwt
 
 
 # ----------code

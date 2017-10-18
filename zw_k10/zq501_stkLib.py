@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 
-import zwSys as zw         #zwProject.zwQuant
+import zwSys as zw         #zwPython.zwQuant
 import zwTools as zwt
 import zwQTBox as zwx
 

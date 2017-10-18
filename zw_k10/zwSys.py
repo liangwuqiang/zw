@@ -5,7 +5,7 @@
 #  http://www.ziwang.com,Python量化第一品牌 
 #  
 #  文件名:zwSys.py
-#  说明：import zwSys as zwProject
+#  说明：import zwSys as zwPython
 #       设置常用变量,类定义、初始化函数
 #  
 # =====================================  
@@ -28,7 +28,7 @@ import zwTools as zwt
 import zwQTBox as zwx
 
 
-#----zwProject.var...
+#----zwPython.var...
 __version__='2016.M5'
 
 #颜色变量
@@ -55,7 +55,7 @@ _rdatMin=_rdat0+"min\\"
 _rdatTick=_rdat0+"tick\\"
 _rdatTickReal=_rdat0+"tickreal\\"
 
-_rdatZW=_rdat0+"zwProject\\"
+_rdatZW=_rdat0+"zwPython\\"
 
 _rTmp="\\zwPython\\zwQuant\\demo\\tmp\\"
 

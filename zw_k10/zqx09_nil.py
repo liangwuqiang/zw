@@ -77,7 +77,7 @@ def tim0Trade_dataPre(qx,xnam0):
     #xtim0=parse('9999-01-01');xtim9=parse('1000-01-01');
     #xtim0=xtim0.strftime('%Y-%m-%d');xtim9=xtim9.strftime('%Y-%m-%d')
     #qx.qxTimSet(xtim0,xtim9)
-    #zwx.stkLibSet8XTim(qx.xtim0,qx.xtim9);#    print('zwProject.stkLibCode',zwProject.stkLibCode)
+    #zwx.stkLibSet8XTim(qx.xtim0,qx.xtim9);#    print('zwPython.stkLibCode',zwPython.stkLibCode)
     #============
     #---设置qxUsr用户数据
     qx.qxUsr=zwx.qxObjSet(qx.xtim0,0,qx.money,0);

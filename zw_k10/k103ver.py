@@ -32,7 +32,7 @@ import pygame
 #import pyopencl
 
 
-#zwProject.xxx
+#zwPython.xxx
 import zwSys as zw  #::zwQuant
 
 

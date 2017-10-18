@@ -1,0 +1,9 @@
+zwQuant 主要有以下模块:
+
+zwBacktest.py,  zw 量化分析:回溯测试工具函数,
+zwQTBox.py,     zw 常用“量化”工具函数集
+zwQTDraw.py,    zw 量化分析:绘图工具函数
+zwStrategy.py,  zw 量化分析:策略工具函数
+zwSys.py,       zw 量化初始化和系统模块,主要定义基础数据类、全局路径、全局变量等
+zwTools.py,     zw 常用(非量化)工具函数集
+zw_talib.py,    zw 版的 talib 函数封装,主要基于 pandas 进行移植 zwBacktest.py

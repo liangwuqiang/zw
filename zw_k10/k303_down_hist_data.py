@@ -4,7 +4,7 @@ import tushare as ts
 import pandas as pd
 import matplotlib as mpl
 
-#zwProject.xxx
+#zwPython.xxx
 import zwSys as zw  #::zwQT
 
 

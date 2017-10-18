@@ -32,9 +32,9 @@ def zw_stk_xedit_all(qx,finx,rsr,rtg):
 #============main        
 
 #    运行前，请在zwdat建立以下3个数据目录
-#    \zwDat\zwProject\cnDay\
-#    \zwDat\zwProject\cnXDay\
-#    \zwDat\zwProject\usDay\
+#    \zwDat\zwPython\cnDay\
+#    \zwDat\zwPython\cnXDay\
+#    \zwDat\zwPython\usDay\
 #    作为输出目录
 #
 
@@ -48,19 +48,19 @@ qdat.prDat();
 #   cnInx
 finx=qdat.rdatInx+'inx_code.csv';
 rsr=qdat.rdatCN+"XDay\\"
-rtg=qdat.rZWcnXDay  #"\zwDat\zwProject\cnXDay\"
+rtg=qdat.rZWcnXDay  #"\zwDat\zwPython\cnXDay\"
 zw_stk_xedit_all(qdat,finx,rsr,rtg);
 
 #   cnSTK
 finx=qdat.rdatInx+'stk_code.csv';
 rsr=qdat.rdatCN+"Day\\"
-rtg=qdat.rZWcnDay   #"\zwDat\zwProject\cnDay\"
+rtg=qdat.rZWcnDay   #"\zwDat\zwPython\cnDay\"
 #zw_stk_xedit_all(qdat,finx,rsr,rtg);
 
 
 #  usSTK
 finx=qdat.rdatInx+'inxYahoo.csv';
 rsr=qdat.rdatUS+"Day\\"
-rtg=qdat.rZWusDay   #"\zwDat\zwProject\usDay\"
+rtg=qdat.rZWusDay   #"\zwDat\zwPython\usDay\"
 zw_stk_xedit_all(qdat,finx,rsr,rtg);        
 

@@ -37,7 +37,7 @@ from numba import *
 
 #-------------
      
-#-------------    zwProject.Quant.BackTest
+#-------------    zwPython.Quant.BackTest
 def bt_init(xlst,rdat,prjNam,money0=1000000):
     '''
     qt_init(qx,xlst,rdat):
@@ -51,7 +51,7 @@ def bt_init(xlst,rdat,prjNam,money0=1000000):
     【输出】：
         qx (zwQuantx): 程序化全局变量qx
         '''
-    #qx=zwProject.zwQuantX('tur',1000000); #100w
+    #qx=zwPython.zwQuantX('tur',1000000); #100w
     qx=zw.zwQuantX(prjNam,money0); #100w   
     #------设置各种价格模式：
     #    priceWrk，策略分析时，使用的股票价格，一般是：dprice，复权收盘价
@@ -68,7 +68,7 @@ def bt_init(xlst,rdat,prjNam,money0=1000000):
     zwx.stkLibRd(xlst,rdat); 
     #
     #大盘指数.设置
-    #zwProject.stkInxLib=None  #全局变量，大盘指数，内存股票数据库
+    #zwPython.stkInxLib=None  #全局变量，大盘指数，内存股票数据库
     qx.stkInxRDat='\\zwdat\\cn\\xday\\'    #大盘指数数据源路径
     qx.stkInxPriceName='close'  #大盘指数数据列名称，默认是:close    
     #大盘指数代码,名称拼音,中文名称

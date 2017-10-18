@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 
-import zwSys as zw         #zwProject.zwQuant
+import zwSys as zw         #zwPython.zwQuant
 import zwQTBox as zwx
 
 #======================
@@ -12,7 +12,7 @@ qx=zw.zwQuantX('xbar',1000000); #100w
 qx.priceCalc,qx.priceWrk,qx.priceBuy='close','close','close'
 xlst=['aeti','egan','glng','simo']   
 zwx.stkLibRd(xlst,'dat\\');
-#print(zwProject.stkCode)
+#print(zwPython.stkCode)
 #
 xtim='2011-01-03';
 qx.qxTim0SetVar(xtim); 

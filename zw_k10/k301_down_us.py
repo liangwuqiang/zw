@@ -5,7 +5,7 @@ import pandas as pd
 #import pandas.io.data as web
 import pandas_datareader.data as web
 
-#zwProject.Quant
+#zwPython.Quant
 import zwSys as zw  
 import zwQTBox as zwx
 

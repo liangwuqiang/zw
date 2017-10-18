@@ -35,8 +35,8 @@ from dateutil.rrule import *
 import pickle
 import numexpr as ne  
 
-# import zwProject.zwSys as zwProject   # zwQuant
-# import zwProject.zwQTBox as zwx
+# import zwSys as zwPython   # zwQuant
+# import zwQTBox as zwx
 
 
 # ----hot.funs

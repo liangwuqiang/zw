@@ -17,7 +17,7 @@ _rdatUS=_rdat0+"us\\"
 _rdatInx=_rdat0+"inx\\"
 _rdatMin=_rdat0+"min\\"
 
-_rdatZW=_rdat0+"zwProject\\"
+_rdatZW=_rdat0+"zwPython\\"
 
 
 #----class

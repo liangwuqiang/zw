@@ -230,7 +230,7 @@ def xtick2minWr(qx, rsk):
         xdf.drop_duplicates(subset = 'time',  keep = 'last',  inplace = True)
         xdf = np.round(xdf, 2)
         xdf = xdf.sort_values(by = ['time'], ascending = False)
-        # fss = zwProject._rdatMin+sgnMin+'\\'+qx.code+'.csv' print(fss)
+        # fss = zwPython._rdatMin+sgnMin+'\\'+qx.code+'.csv' print(fss)
         fss = rsk+sgnMin+'\\'+qx.code+'.csv'
         print(fss)
         if len(xdf)>3:
@@ -625,7 +625,7 @@ def stkInxLibRd(qx):
     qx.stkInxName = 'sz001'    # 大盘指数名称，拼音
     qx.stkInxCName = '上证指数'    # 大盘指数中文名称，拼音
     # 
-    zwProject.stkInxLib = None  # 全局变量，大盘指数，内存股票数据库
+    zwPython.stkInxLib = None  # 全局变量，大盘指数，内存股票数据库
 
     """
     if qx.stkInxCode != '':
@@ -638,14 +638,14 @@ def stkInxLibRd(qx):
 
 
 def stkInxLibSet8XTim(qx, dtim0, dtim9):
-    """ 根据时间段，切割大盘指数数据 zwProject.stkInxLib
+    """ 根据时间段，切割大盘指数数据 zwPython.stkInxLib
 
     Args:
         dtim0（str）：起始时间
         dtim9（str）:结束时间
 
     :ivar
-    zwProject.stkInxLib，大盘指数数据
+    zwPython.stkInxLib，大盘指数数据
     """
     df10 = zw.stkInxLib
     # print(df10.head())
@@ -722,9 +722,9 @@ def stkLibSet8XTim(dtim0, dtim9):
         else:
             df20 = df10[(df10.index >= dtim0)&(df10.index <= dtim9)]
         # 
-        # zwProject.stkLibCode.append(xcod)
+        # zwPython.stkLibCode.append(xcod)
         zw.stkLib[xcod] = df20.sort_index()
-        # print(zwProject.stkLib[xcod])
+        # print(zwPython.stkLib[xcod])
         # print(df20)
 
 
@@ -1093,7 +1093,7 @@ def xusr4xtrd(qx, b2):
     xcod = b2['code']
     if xcod != '':
         xfg = xcod in qx.qxUsrStk
-        # s2 = zwBox.xobj2str(b2, zwProject.xbarName) print(xfg, '::b2, ', s2)
+        # s2 = zwBox.xobj2str(b2, zwPython.xbarName) print(xfg, '::b2, ', s2)
 
         if xfg:
             xnum = qx.qxUsrStk[xcod]
@@ -1131,7 +1131,7 @@ def xtrdLibNilAdd(qx):
     qx.xtrdChk['ID'] = 'nil'
     qx.xtrdNilLib = qx.xtrdNilLib.append(qx.xtrdChk.T, ignore_index = True)
 
-# --zwProject.ret.xxx
+# --zwPython.ret.xxx
 
 def zwRetTradeCalc(qx):
     """ 输出、计算交易数据
@@ -1374,7 +1374,7 @@ def df2cnstk(df0):
 
 
 def df2zw(df0):
-    """ 股票数据格式转换，转换为 zwProject 格式
+    """ 股票数据格式转换，转换为 zwPython 格式
 
     Args:
         df0 (pd.DataFrame): 股票数据
@@ -1400,7 +1400,7 @@ def df2zw(df0):
 
 
 def df2zwAdj(df0):
-    """ 股票数据格式转换，转换为 zwProject 增强版格式，带 adj close
+    """ 股票数据格式转换，转换为 zwPython 增强版格式，带 adj close
 
     Args:
         df0 (pd.DataFrame): 股票数据
@@ -1547,7 +1547,7 @@ def sta_dataPre0xtim(qx, xnam0):
         if xt9k != '':
             if qx.xtim9>xt9k:qx.xtim9 = xt9k
         qx.qxTimSet(qx.xtim0, qx.xtim9)
-        stkLibSet8XTim(qx.xtim0, qx.xtim9) #     print('zwProject.stkLibCode', zwProject.stkLibCode)
+        stkLibSet8XTim(qx.xtim0, qx.xtim9) #     print('zwPython.stkLibCode', zwPython.stkLibCode)
 
     # ---stkInx 读取大盘指数数据，并裁剪数据源
     # print('finx', qx.stkInxCode)

@@ -5,7 +5,7 @@
 #   http://www.ziwang.com, Python量化第一品牌 
 #   
 #   文件名:zwSys.py
-#   说明：import zwSys as zwProject
+#   说明：import zwSys as zwPython
 #        设置常用变量, 类定义、初始化函数
 #   
 #  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =
@@ -24,11 +24,11 @@ from dateutil import rrule
 # import matplotlib as mpl
 # from matplotlib import pyplot as plt
 
-import zwProject.zwTools as zwt
-import zwProject.zwQTBox as zwx
+import zwTools as zwt
+import zwQTBox as zwx
 
 
-# ----zwProject.var...
+# ----zwPython.var...
 __version__ = '2016.M5'
 
 # 颜色变量
@@ -47,17 +47,17 @@ _corBlueCV = (255, 0, 0)
 
 # ----init.dir 目录设置
 
-_rdat0 = "\\zwDat\\"
-_rdatCN = _rdat0+"cn\\"
-_rdatUS = _rdat0+"us\\"
-_rdatInx = _rdat0+"inx\\"
-_rdatMin = _rdat0+"min\\"
-_rdatTick = _rdat0+"tick\\"
-_rdatTickReal = _rdat0+"tickreal\\"
+_rdat0 = "zwDat/"
+_rdatCN = _rdat0+"cn/"
+_rdatUS = _rdat0+"us/"
+_rdatInx = _rdat0 + "inx/"
+_rdatMin = _rdat0+"min/"
+_rdatTick = _rdat0+"tick/"
+_rdatTickReal = _rdat0+"tickreal/"
 
-_rdatZW = _rdat0+"zwProject\\"
+_rdatZW = _rdat0+"zwPython/"
 
-_rTmp = "\\zwPython\\zwQuant\\demo\\tmp\\"
+_rTmp = "/zwPython/zwQuant/demo/tmp/"
 
 
 # ----init.stk.var 初始化数据设置
@@ -352,8 +352,8 @@ class zwDatX(object):
     def __init__(self, rs0=_rdat0):
         # ----tick5.rss
         self.rdat = rs0  # \zwDat\
-        self.rtickTim = rs0+'tick\\'  # \zwDat\ticktim\  2012-01\
-        self.rtickTimMon = self.rtickTim+'2010-01\\'  # \zwDat\ticktim\  2012-01\
+        self.rtickTim = rs0+'tick/'  # \zwDat\ticktim\  2012-01\
+        self.rtickTimMon = self.rtickTim+'2010-01/'  # \zwDat\ticktim\  2012-01\
         #  xxx.zwlib
         self.stkCodeLib = []
         #  fn_xxx
@@ -382,7 +382,7 @@ class zwDatX(object):
         self.codeInx0k = -1
         # 
         self.rmin0k = _rdatMin
-        self.rminWrk = self.rmin0k+'M05\\'
+        self.rminWrk = self.rmin0k+'M05/'
         
         # self.fn_min = []
         self.min_ksgns = ['05', '15', '30', '60'] # 分时数据时间模式列表，一般是[5，15，30，60]，也可以自行设置
@@ -407,17 +407,17 @@ class zwDatX(object):
         self.rdatInx = _rdatInx
         
         self.rdatZW = _rdatZW
-        self.rZWcnXDay = _rdatZW+"cnXDay\\"
-        self.rZWcnDay = _rdatZW+"cnDay\\"
-        self.rZWusDay = _rdatZW+"usDay\\"
+        self.rZWcnXDay = _rdatZW+"cnXDay/"
+        self.rZWcnDay = _rdatZW+"cnDay/"
+        self.rZWusDay = _rdatZW+"usDay/"
         # 
-        self.rDay = rs0+"day\\" 
-        self.rXDay = rs0+"xday\\"
+        self.rDay = rs0+"day/" 
+        self.rXDay = rs0+"xday/"
         
-        # self.rDay9 = rs0+"day9\\" # ?????
+        # self.rDay9 = rs0+"day9/" # ?????
         
         #   min.dat
-        # self.rTick = _rdatMin+"tick\\"
+        # self.rTick = _rdatMin+"tick/"
 
         # 
         
