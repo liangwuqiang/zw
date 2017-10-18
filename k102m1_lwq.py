@@ -9,9 +9,9 @@ import zwTools as zwt
 def zw_anz_m1sub(xcod, rss, monStr):
     """
     :param xcod: 股票代号
-    :param rss: 存放目录 'zwDat/cn/xday/'
-    :param monStr: 当前月份 ‘01’
-    :return:
+    :param rss: 数据文件存放的目录 'zwDat/cn/xday/'
+    :param monStr: 指定月份 ‘01’～'12'
+    :return: nSum, nAdd, nDec  所有月份累计，上涨月份累计，下跌月份累计
     """
     fss = rss + xcod + ".csv"  # 'zwDat/cn/xday/000001.csv'
     print(fss)  # 文件名
@@ -39,16 +39,16 @@ def zw_anz_m1sub(xcod, rss, monStr):
             monStr1 = ''.join([ystr, '-', monStr, '-01'])  # 当前月的第一天
             monStr9 = ''.join([ystr, '-', monStr, '-', dayStr])  # 当前月的最后一天
             df2 = df[(df.index >= monStr1) & (df.index <= monStr9)]
-            # 月初到月底之间的数据
+            # 提取月初到月底之间的数据
 
             if len(df2) > 0:  # 若存在交易日（处理月份用）
                 _kmon5 = '%02d' % df2.index[0].month  # 选取交易日期中的月份，并转为string
                 if _kmon5 == monStr:  # 若上述月份为函数输入的变量
-                    xd1a = df2.ix[0]
-                    xd1z = df2.ix[-1]
-                    nSum += 1  # 交易月份+1
-                    vd1a = xd1a['close']
-                    vd1z = xd1z['close']  # 选取收盘价位
+                    xd1a = df2.ix[0]  # 月初首条记录
+                    xd1z = df2.ix[-1]  # 月末最后一条记录
+                    nSum += 1  # 所有月份累计
+                    vd1a = xd1a['close']  # 月初的收盘价
+                    vd1z = xd1z['close']  # 月末的收盘价
                     if vd1z > vd1a:
                         nAdd += 1  # 比较收盘价位，判定升跌
                     else:
@@ -58,10 +58,18 @@ def zw_anz_m1sub(xcod, rss, monStr):
         pass  # skip,error
 
     print('nSum,nAdd,nDec,', nSum, nAdd, nDec)
-    return nSum, nAdd, nDec  # 返回值为交易月份数量，上升，下跌
+    return nSum, nAdd, nDec  # 返回值为所有月份累计，上升月份，下跌月份统计
 
 
-def zw_stk_anz_m01(qx, finx0, rss, ksgn):  # 对每个股票运算一次上一个函数
+def zw_stk_anz_m01(qx, finx0, rss, ksgn):
+    """
+    对每个股票运算一次上一个函数
+    :param qx: zw.zwDatX(zw._rdat0)的一个实例
+    :param finx0: 从股票种类列表中提取的股票名称，用于文件读取
+    :param rss: 数据文件存放的目录 'zwDat/cn/xday/'
+    :param ksgn:
+    :return: mx1
+    """
     fss = qx.rdatInx + finx0 + ".csv"  # stk_code.csv,inxYahoo.csv
 
     codTyp = 'gbk'
@@ -104,14 +112,21 @@ def zw_stk_anz_m01(qx, finx0, rss, ksgn):  # 对每个股票运算一次上一�
     return mx1
 
 
-def zw_stk_anz_mx(qx, finx0, rss):  # 生成一个csv文件
-    c10 = [  # csv的第一列
+def zw_stk_anz_mx(qx, finx0, rss):
+    """
+    生成一个csv文件
+    :param qx: zw.zwDatX(zw._rdat0)的一个实例
+    :param finx0: 从股票种类列表中提取的股票名称，用于输出CSV文件名
+    :param rss: 数据文件存放的目录 'zwDat/cn/xday/'
+    :return: 空
+    """
+    c10 = [  # 新构造csv文件的字段名
         'finx'
         , 'ksgn'
         , 'nstk'
-        , 'nSum'
-        , 'nAdd'
-        , 'nDec'
+        , 'nSum'  # 所有月份累计
+        , 'nAdd'  # 上涨月份累计
+        , 'nDec'  # 下跌月份累计
         , 'kAdd'
         , 'kDec'
     ]
@@ -132,7 +147,13 @@ def zw_stk_anz_mx(qx, finx0, rss):  # 生成一个csv文件
         # df.to_csv(ftg, index=False, encoding='utf8')  # 保存为csv，utf8编码
 
 
-def zw_stk_anz_mx_all(qx, xlst):  # 遍历指定list中的股票
+def zw_stk_anz_mx_all(qx, xlst):
+    """
+    遍历指定list中的股票
+    :param qx: zw.zwDatX(zw._rdat0)的一个实例
+    :param xlst: 股票种类列表，对应于数据的文件名
+    :return: 空
+    """
     for fx in xlst:
         if fx.find('Yah') > 0:
             # rss=qx.rZWusDay
