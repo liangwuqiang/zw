@@ -407,9 +407,9 @@ class zwDatX(object):
         self.rdatInx = _rdatInx
         
         self.rdatZW = _rdatZW
-        self.rZWcnXDay = _rdatZW+"cnXDay/"
-        self.rZWcnDay = _rdatZW+"cnDay/"
-        self.rZWusDay = _rdatZW+"usDay/"
+        self.rZWcnXDay = _rdatZW + "cnXDay/"
+        self.rZWcnDay = _rdatZW + "cnDay/"
+        self.rZWusDay = _rdatZW + "usDay/"
         # 
         self.rDay = rs0+"day/" 
         self.rXDay = rs0+"xday/"
