@@ -1,27 +1,29 @@
-# ----------code
+
+import os
 import numpy as np
 import pandas as pd
 
 import zwSys as zw
-import zwTools as zwt
+import zwTools as zwt  # 用于获取每月最后一天
 
 
 def zw_anz_m1sub(stkCode, path, month):
     """
+    单只股票的当前月份统计
     :param stkCode: 股票代号
-    :param path: 数据文件存放的目录 'zwDat/cn/xday/'
-    :param month: 指定月份 ‘01’～'12'
-    :return: numSum, numInc, numDec  所有月份累计，上涨月份累计，下跌月份累计
+    :param path: 数据文件存放的目录 './zwDat/cn/xday/'
+    :param month: 指定当前月份 ‘01’～'12'
+    :return: numSum, numInc, numDec  当前月份合计，上涨月份合计，下跌月份合计
     """
-    filename = path + stkCode + ".csv"  # 'zwDat/cn/xday/000001.csv'
-
-    numSum, numInc, numDec = 0, 0, 0  # 输入的月份数，其中上升的月份，其中下跌的月份
-
+    filename = path + stkCode + ".csv"  # './zwDat/cn/xday/000001.csv'
     # print(filename)
+
+    numSum, numInc, numDec = 0, 0, 0  # 变量初始化
+
     try:
         df = pd.read_csv(filename, index_col=0, parse_dates=[0], encoding='utf-8')
         # 读取数据文件，第一列指定为索引列，并解析为日期类型
-        df = df.rename(columns={'Close': 'close'})  # 如果列名是Close，则改名，收盘价
+        # df = df.rename(columns={'Close': 'close'})  # 如果列名是Close，则改名，收盘价
         df = df.sort_index()  # 按日期排序
 
         startTime = df.index[0]  # 取得时间列的第一行
@@ -30,154 +32,162 @@ def zw_anz_m1sub(stkCode, path, month):
         endYear = endTime.year  # 最后一年
 
         for year in range(startYear, endYear+1):  # 遍历所有年份
-            year = str(year)  # 年份
-            last_day = zwt.lastDay(year, int(month))  # 年份，每月的最后一天的日期
+
+            last_day = zwt.lastDay(year, int(month))  # 获取每月的最后一天的日期
             day = '%02d' % last_day
+            year = str(year)  # 年份
             firstDate = ''.join([year, '-', month, '-01'])  # 当前月的第一天
             lastDate = ''.join([year, '-', month, '-', day])  # 当前月的最后一天
+
             df_oneMonth = df[(df.index >= firstDate) & (df.index <= lastDate)]
-            # 提取月初到月底之间的数据
-            """
+            # 提取月初到月底之间的数据块
+
             if len(df_oneMonth) > 0:  # 若存在交易日（处理月份用）
-                _kmon5 = '%02d' % df_oneMonth.index[0].month  # 选取交易日期中的月份，并转为string
-                if _kmon5 == month:  # 若上述月份为函数输入的变量
-                    firstRecoder = df_oneMonth.iloc[0]  # 月初首条记录
-                    lastRecoder = df_oneMonth.iloc[-1]  # 月末最后一条记录
-                    numSum += 1  # 所有月份累计
-                    firstClose = firstRecoder['close']  # 月初的收盘价
-                    lastClose = lastRecoder['close']  # 月末的收盘价
-                    if lastClose > firstClose:
-                        numInc += 1  # 比较收盘价位，判定升跌
-                    else:
-                        numDec += 1
-            """
-            firstRecoder = df_oneMonth.iloc[0]  # 月初首条记录
-            lastRecoder = df_oneMonth.iloc[-1]  # 月末最后一条记录
-            numSum += 1  # 所有月份累计
-            firstClose = firstRecoder['close']  # 月初的收盘价
-            lastClose = lastRecoder['close']  # 月末的收盘价
-            if lastClose > firstClose:
-                numInc += 1  # 比较收盘价位，判定升跌
-            else:
-                numDec += 1
+                numSum += 1  # 当前月份合计递增
+
+                firstRecoder = df_oneMonth.iloc[0]  # 月初首条记录
+                lastRecoder = df_oneMonth.iloc[-1]  # 月末最后一条记录
+
+                firstClose = firstRecoder['close']  # 月初的收盘价
+                lastClose = lastRecoder['close']  # 月末的收盘价
+
+                if firstClose < lastClose:  # 比较月初月末收盘价，判断涨跌
+                    numInc += 1
+                else:
+                    numDec += 1
+
     except IOError:
-        print('CSV文件不存在，跳过')
+        print('CSV文件不存在，跳过', filename)
         pass  # 跳过，不处理
 
     # print('numSum,numInc,numDec = ', numSum, numInc, numDec)
-    return numSum, numInc, numDec  # 返回值为所有月份累计，上升月份，下跌月份统计
+    return numSum, numInc, numDec  # 返回值为当前月份合计，上涨月份，下跌月份合计
 
 
-def zw_stk_anz_m01(qx, inxFile, path, month):
+def zw_stk_anz_m01(myZwDatX, indexFile, path, month):
     """
-    对每个股票运算一次上一个函数
-    :param qx: 环境变量，zwDat目录位置
-    :param inxFile: 从股票种类列表中提取的股票名称，用于文件读取
-    :param path: 数据文件存放的目录 'zwDat/cn/xday/'
-    :param month: 指定月份
+    针对当前月份，对股票索引文件中的每只股票进行上涨或下跌的统计，数据保存为字典格式返回
+    :param myZwDatX: zwDatX类实例
+    :param indexFile: 股票索引名称
+    :param path: 数据文件存放的目录 './zwDat/cn/xday/'
+    :param month: 指定的当前月份
     :return: monTotal 包含指定月份的统计数据的字典
     """
-    filename = qx.rdatInx + inxFile + ".csv"  # filename = zwDat/inx/inx_code.csv
+    filename = myZwDatX.rdatInx + indexFile + ".csv"  # filename = ./zwDat/inx/inx_code.csv
 
-    codeType = 'gbk'
-    if path.find('us') > 0:
+    codeType = 'gbk'  # 应该统一使用utf-8编码格式
+    if 'us' in path:
         codeType = 'utf-8'
-    # print('文件路径及文件编码： ', filename, codeType)
+    # print('文件路径 文件编码：', filename, codeType)
 
-    df = pd.read_csv(filename, encoding=codeType)  # 读取csv文件
+    df = pd.read_csv(filename, encoding=codeType)  # 读取csv数据文件
 
-    print(df.head())
-    print('文件路径： ',filename)
+    # print(df.head())
+    # print('文件路径：',filename)
 
     monTotal = dict()
-    monTotal['inxFile'] = inxFile  # 股票种类 in_code
+    monTotal['inxFile'] = indexFile  # 股票索引名称
     monTotal['month'] = month  # 月份 01~12
-    monTotal['numSum'] = 0  # 总数合计
+    monTotal['numSum'] = 0  # 当前月总数合计
     monTotal['numInc'] = 0  # 上涨数合计
     monTotal['numDec'] = 0  # 下跌数合计
 
-    numLine = len(df['code'])
-    monTotal['numStk'] = numLine  # 股票总行数
+    numStk = len(df['code'])
+    monTotal['numStk'] = numStk  # 股票总支数
 
     for i, stkCode in enumerate(df['code']):  # 遍历当前类别的股票代码
         if not isinstance(stkCode, str):  # 非正常股票代码处理
             stkCode = "%06d" % stkCode
 
         # print(stkCode, path, month)
-        dSum, dAdd, dDec = zw_anz_m1sub(stkCode, path, month)
+        stkMonSum, stkMonAdd, stkMonDec = zw_anz_m1sub(stkCode, path, month)
+        # 一支股票在当前月份内的总的、上涨、下跌合计
 
-        monTotal['numSum'] = monTotal['numSum'] + dSum
-        monTotal['numInc'] = monTotal['numInc'] + dAdd
-        monTotal['numDec'] = monTotal['numDec'] + dDec
-        # print(i, '/', xn9, stkCode, monTotal)
+        monTotal['numSum'] = monTotal['numSum'] + stkMonSum
+        monTotal['numInc'] = monTotal['numInc'] + stkMonAdd
+        monTotal['numDec'] = monTotal['numDec'] + stkMonDec
+        # print(i, '/', numStk, stkCode, monTotal)
 
     monTotal['preInc'] = np.round(monTotal['numInc'] * 100 / monTotal['numSum'])  # 上涨百分比
     monTotal['preDec'] = np.round(monTotal['numDec'] * 100 / monTotal['numSum'])  # 下跌百分比
 
     # print(monTotal)
-    return monTotal
+    return monTotal  # dict格式
 
 
-def zw_stk_anz_mx(qx, inxFile, path):
+def zw_stk_anz_mx(myZwDatX, indexFile, path):
     """
-    将一个类别的股票，生成一个csv文件
-    :param qx: 环境变量，zwDat目录位置
-    :param inxFile: 从股票种类列表中提取的股票名称，用于输出CSV文件名
-    :param path: 数据文件存放的目录 'zwDat/cn/xday/'
+    按每个股票索引文件，生成相应的csv文件
+    :param myZwDatX: zwDatX类的实例
+    :param indexFile: 股票索引文件名，用于输出csv文件名
+    :param path: 相应的csv数据文件存放的目录 例如'./zwDat/cn/xday/'
     :return: 空
     """
-    fields = [  # 构造csv文件的字段名
-        'inxFile'  # 股票类别名称
+    columns = [  # 构造csv文件的字段名
+        'inxFile'  # 股票索引名称
         , 'month'  # 当前月份
-        , 'numStk'  # 当前类别种股票支数
-        , 'numSum'  # 所有月份累计
-        , 'numInc'  # 上涨月份累计
-        , 'numDec'  # 下跌月份累计
+        , 'numStk'  # 当前索引股票总支数
+        , 'numSum'  # 当前月份合计
+        , 'numInc'  # 上涨月份合计
+        , 'numDec'  # 下跌月份合计
         , 'preInc'  # 上涨百分比
         , 'preDec'  # 下跌百分比
     ]
 
-    df = pd.DataFrame(columns=fields)  # 定义dataframe
-    filename = "temp/monTotal_" + inxFile + ".csv"  # 将要保存csv文件的路径
-    print('csv文件的路径: ' + filename)
+    df = pd.DataFrame(columns=columns)  # 定义dataframe
+    filename = "temp/monTotal_" + indexFile + ".csv"  # 将要保存csv文件的路径
+    # print('csv文件的路径: ' + filename)
 
-    for i in range(12):
+    for i in range(12):  # 遍历1～12月
         month = "%02d" % (i + 1)  # 两位表示的月份
 
-        monTotal = zw_stk_anz_m01(qx, inxFile, path, month)  # 当前股票类别当前月的涨跌统计 字典
+        monTotal = zw_stk_anz_m01(myZwDatX, indexFile, path, month)
+        # 当前股票类别、当前月的涨跌统计 字典格式
 
-        ds = pd.Series(monTotal, index=fields)  # 将字典内容转成一列数据
+        ds = pd.Series(monTotal, index=columns)  # 将字典内容转成一列数据
         ds = ds.T  # 将列数据转成行数据
         df = df.append(ds, ignore_index=True)  # 将行数据添加到dataframe中
-        # break
+
+        # break  # 测试用
     # print(df.head())
+
+    if not os.path.exists('temp'):
+        os.mkdir('temp')
     df.to_csv(filename, index=False, encoding='utf-8')  # 将dataframe数据存盘csv
+    print('已完成文件', filename)
 
 
-def zw_stk_anz_mx_all(qx, xlist):
+def zw_stk_anz_mx_all(myZwDatX, indexList):
     """
-    遍历股票类别list中的股票，提取列表项逐个调用函数处理
-    :param qx: 环境变量，zwDat目录位置
-    :param xlist: 股票类别列表
+    遍历股票indexList中的股票，选择相应的数据访问路径，调用zw_stk_anz_mx函数
+    :param myZwDatX: zwDatX类的实例，用于获取设置参数
+    :param indexList: 股票索引列表
     :return: 空
     """
-    for inxFile in xlist:
-        if inxFile.find('Yah') > 0:
-            path = qx.rdat + 'us/day/'  # path = zwDat/us/xday/
+    for indexFile in indexList:
+        if 'Yah' in indexFile:
+            path = myZwDatX.rdat + 'us/day/'  # path = ./zwDat/us/day/
+        elif indexFile == 'inx_code':
+            path = myZwDatX.rdat + 'cn/xday/'  # path = ./zwDat/cn/xday/ 指数数据
+        elif 'stk' in indexFile:
+            path = myZwDatX.rdat + 'cn/Day/'  # path = ./zwDat/cn/day/ 个股数据
         else:
-            if inxFile == 'inx_code':
-                path = qx.rdat + 'cn/xday/'  # path = zwDat/cn/xday/ 指数数据
-            else:
-                path = qx.rdat + 'cn/Day/'  # path = zwDat/cn/day/ 个股数据
+            path = '查无此处'
 
-        print('参数 qx.rdat inxFile path = ', qx.rdat, inxFile, path)
-        zw_stk_anz_mx(qx, inxFile, path)  # 生成csv文件
+        # print('indexFile path = ', indexFile, path)
+        zw_stk_anz_mx(myZwDatX, indexFile, path)  # 生成csv文件
 
 
 def main():
-    qx = zw.zwDatX(zw._rdat0)  # 初始化环境变量
+    """
+    主控模块
+    :return: 空
+    """
+    root = './zwDat/'
+    myZwDatX = zw.zwDatX(root)  # 用数据文件根目录实例化zwDatX类
 
-    # uslist = [
+    # 相应的美国股市数据文件还没有下载，先注释掉以下代码
+    # usList = [
     #     'inxYahoo30sp'  # 道琼斯30指数美股代码
     #     , 'inxYahoo100ns'  # 纳斯达克100指数美股代码
     #     , 'inxYahoo100sp'  # 道琼斯100工业指数美股代码
@@ -185,16 +195,16 @@ def main():
     #     , 'inxYahoo500sp'  # 道琼斯500指数美股代码
     #     , 'inxYahoo'  # 全部6688美股代码
     # ]
-    # zw_stk_anz_mx_all(qx, uslist)
+    # zw_stk_anz_mx_all(myZwDatX, usList)
 
-    cnlist = [
+    cnList = [
         'inx_code'  # 中国A股大盘及各种指数代码
         , 'stk_sz50'  # 中国上证50指数股票代码
         , 'stk_hs300'  # 中国沪深300指数股票代码
         , 'stk_zz500'  # 中国中证500指数股票代码
         , 'stk_code'  # 中国A股2810只股票代码
     ]
-    zw_stk_anz_mx_all(qx, cnlist)
+    zw_stk_anz_mx_all(myZwDatX, cnList)
 
     print('全部处理完成')
 

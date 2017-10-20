@@ -133,7 +133,7 @@ class zwQuantX(object):
     def __init__(self, prjNam, dbase0 = 10000):
         """ 默认初始化函数
         Args:
-            prjNam (list): 项目名称
+            prjNam (str): 项目名称  # 原来是(list),不知道为啥？
             dbase0 (int): 启动资金
         """
 
@@ -432,7 +432,7 @@ class zwDatX(object):
         # 
         # 
           
-    def prDat(self):  
+    def printData(self):
         """ 输出相关数据目录
         """
       
