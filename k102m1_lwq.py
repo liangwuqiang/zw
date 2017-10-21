@@ -23,7 +23,7 @@ def zw_anz_m1sub(stkCode, path, month):
     try:
         df = pd.read_csv(filename, index_col=0, parse_dates=[0], encoding='utf-8')
         # 读取数据文件，第一列指定为索引列，并解析为日期类型
-        # df = df.rename(columns={'Close': 'close'})  # 如果列名是Close，则改名，收盘价
+        df = df.rename(columns={'Close': 'close'})  # 针对美国股市
         df = df.sort_index()  # 按日期排序
 
         startTime = df.index[0]  # 取得时间列的第一行
@@ -166,7 +166,7 @@ def zw_stk_anz_mx_all(myZwDatX, indexList):
     """
     for indexFile in indexList:
         if 'Yah' in indexFile:
-            path = myZwDatX.rdat + 'us/day/'  # path = ./zwDat/us/day/
+            path = myZwDatX.rdat + 'us/Day/'  # path = ./zwDat/us/day/
         elif indexFile == 'inx_code':
             path = myZwDatX.rdat + 'cn/xday/'  # path = ./zwDat/cn/xday/ 指数数据
         elif 'stk' in indexFile:
@@ -187,24 +187,24 @@ def main():
     myZwDatX = zw.zwDatX(root)  # 用数据文件根目录实例化zwDatX类
 
     # 相应的美国股市数据文件还没有下载，先注释掉以下代码
-    # usList = [
-    #     'inxYahoo30sp'  # 道琼斯30指数美股代码
-    #     , 'inxYahoo100ns'  # 纳斯达克100指数美股代码
-    #     , 'inxYahoo100sp'  # 道琼斯100工业指数美股代码
-    #     , 'inxYahoo600'  # 量化常用美股600股票代码
-    #     , 'inxYahoo500sp'  # 道琼斯500指数美股代码
-    #     , 'inxYahoo'  # 全部6688美股代码
-    # ]
-    # zw_stk_anz_mx_all(myZwDatX, usList)
-
-    cnList = [
-        'inx_code'  # 中国A股大盘及各种指数代码
-        , 'stk_sz50'  # 中国上证50指数股票代码
-        , 'stk_hs300'  # 中国沪深300指数股票代码
-        , 'stk_zz500'  # 中国中证500指数股票代码
-        , 'stk_code'  # 中国A股2810只股票代码
+    usList = [
+        'inxYahoo30sp'  # 道琼斯30指数美股代码
+        , 'inxYahoo100ns'  # 纳斯达克100指数美股代码
+        , 'inxYahoo100sp'  # 道琼斯100工业指数美股代码
+        , 'inxYahoo600'  # 量化常用美股600股票代码
+        , 'inxYahoo500sp'  # 道琼斯500指数美股代码
+        , 'inxYahoo'  # 全部6688美股代码
     ]
-    zw_stk_anz_mx_all(myZwDatX, cnList)
+    zw_stk_anz_mx_all(myZwDatX, usList)
+
+    # cnList = [
+    #     'inx_code'  # 中国A股大盘及各种指数代码
+    #     , 'stk_sz50'  # 中国上证50指数股票代码
+    #     , 'stk_hs300'  # 中国沪深300指数股票代码
+    #     , 'stk_zz500'  # 中国中证500指数股票代码
+    #     , 'stk_code'  # 中国A股2810只股票代码
+    # ]
+    # zw_stk_anz_mx_all(myZwDatX, cnList)
 
     print('全部处理完成')
 

@@ -35,14 +35,22 @@ def main():
     df.plot(kind='line', colormap='hot', rot=0, figsize=(20, 5))
     plt.legend(ncol=3,loc=2)
     plt.tight_layout()
-    plt.show()
-    
+
     # 美国股市
+    usList = [
+        'inxYahoo30sp'  # 道琼斯30指数美股代码
+        , 'inxYahoo100ns'  # 纳斯达克100指数美股代码
+        , 'inxYahoo100sp'  # 道琼斯100工业指数美股代码
+        , 'inxYahoo600'  # 量化常用美股600股票代码
+        , 'inxYahoo500sp'  # 道琼斯500指数美股代码
+        # , 'inxYahoo'  # 全部6688美股代码
+    ]
     # usList=['xYah30sp','xYah100ns','xYah100sp','xYah600','xYah500sp','xYah']
-    # df = mx_sum_main(usList)
-    # df.plot(kind='bar',colormap='hot',rot=0,figsize=(20,5))
-    # plt.legend(ncol=3,loc=2)
-    # plt.tight_layout()
+    df = mx_sum_main(usList)
+    df.plot(kind='bar',colormap='hot',rot=0,figsize=(20,5))
+    plt.legend(ncol=3,loc=2)
+    plt.tight_layout()
+    plt.show()
 
 if __name__ == '__main__':
     main()
